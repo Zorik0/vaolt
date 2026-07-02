@@ -1,0 +1,93 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Household document data by id.
+    function hh(hid) {
+      return get(/databases/$(database)/documents/households/$(hid)).data;
+    }
+    function isMemberOf(hid) {
+      return signedIn() && request.auth.uid in hh(hid).memberIds;
+    }
+    function isManagerOf(hid) {
+      return signedIn() && hh(hid).managerId == request.auth.uid;
+    }
+
+    /* ---------------------------- users ---------------------------- */
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create: if signedIn()
+                    && request.auth.uid == userId
+                    && request.resource.data.uid == userId;
+      allow update: if signedIn() && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    /* -------------------------- households -------------------------- */
+    match /households/{hid} {
+      function data() { return resource.data; }
+      function incoming() { return request.resource.data; }
+      function isManagerNow() {
+        return signedIn() && data().managerId == request.auth.uid;
+      }
+      function isMemberNow() {
+        return signedIn() && request.auth.uid in data().memberIds;
+      }
+      // A signed-in user adding only themselves to the member list (join by code).
+      function isSelfJoin() {
+        return signedIn()
+          && !(request.auth.uid in data().memberIds)
+          && request.auth.uid in incoming().memberIds
+          && incoming().memberIds.hasAll(data().memberIds)
+          && incoming().memberIds.size() == data().memberIds.size() + 1
+          && incoming().managerId == data().managerId
+          && incoming().inviteCode == data().inviteCode
+          && incoming().budgets == data().budgets;
+      }
+      // A member updating denormalised profile data without touching structure.
+      function isMemberProfileUpdate() {
+        return isMemberNow()
+          && incoming().memberIds == data().memberIds
+          && incoming().managerId == data().managerId
+          && incoming().budgets == data().budgets
+          && incoming().inviteCode == data().inviteCode;
+      }
+
+      // Readable by any signed-in user so invite codes can be resolved on join.
+      allow read: if signedIn();
+      allow create: if signedIn()
+                    && incoming().managerId == request.auth.uid
+                    && request.auth.uid in incoming().memberIds;
+      allow update: if isManagerNow() || isSelfJoin() || isMemberProfileUpdate();
+      allow delete: if isManagerNow();
+
+      /* ----------------------- expenses ----------------------- */
+      match /expenses/{eid} {
+        allow read: if isMemberOf(hid);
+        allow create, update, delete: if isManagerOf(hid);
+      }
+
+      /* ---------------------- settlements --------------------- */
+      match /settlements/{sid} {
+        allow read: if isMemberOf(hid);
+        // Manager records any payment; a member may record one they are paying.
+        allow create: if isManagerOf(hid)
+                      || (isMemberOf(hid) && request.resource.data.fromUid == request.auth.uid);
+        allow update: if isManagerOf(hid)
+                      || (isMemberOf(hid) && resource.data.fromUid == request.auth.uid);
+        allow delete: if isManagerOf(hid);
+      }
+
+      /* ----------------------- recurring ---------------------- */
+      match /recurring/{rid} {
+        allow read: if isMemberOf(hid);
+        allow create, update, delete: if isManagerOf(hid);
+      }
+    }
+  }
+}
