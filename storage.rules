@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function household(hid) {
+      return firestore.get(/databases/(default)/documents/households/$(hid)).data;
+    }
+    function isMember(hid) {
+      return signedIn() && request.auth.uid in household(hid).memberIds;
+    }
+    function isManager(hid) {
+      return signedIn() && household(hid).managerId == request.auth.uid;
+    }
+
+    // Receipt uploads live under each household.
+    match /households/{hid}/receipts/{allPaths=**} {
+      allow read: if isMember(hid);
+      allow write: if isManager(hid)
+                   && request.resource.size < 8 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*|application/pdf');
+      allow delete: if isManager(hid);
+    }
+  }
+}
