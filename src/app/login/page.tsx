@@ -19,8 +19,8 @@ import {
 import { APP_NAME } from "@/lib/constants";
 
 const LEDGER = [
-  { label: "Priya → Aarav", amount: "₹7,040" },
-  { label: "Karan → Aarav", amount: "₹6,760" },
+  { label: "Roommate A → Roommate C", amount: "₹7,040" },
+  { label: "Roommate B → Roommate C", amount: "₹6,760" },
 ];
 
 export default function LoginPage() {
