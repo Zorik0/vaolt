@@ -36,7 +36,7 @@ function apply(resolved: Resolved) {
   root.classList.toggle("dark", resolved === "dark");
   root.style.colorScheme = resolved;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", resolved === "dark" ? "#111310" : "#efede6");
+  if (meta) meta.setAttribute("content", resolved === "dark" ? "#0b0a08" : "#f6f3ee");
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
