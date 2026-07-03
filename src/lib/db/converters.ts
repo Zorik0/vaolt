@@ -7,6 +7,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { DEFAULT_BUDGETS } from "../constants";
 import type { Expense, Household, RecurringExpense, Settlement } from "../types";
 
 /** Generic converter that injects the document id and strips it on write. */
@@ -23,7 +24,27 @@ function withId<T extends { id: string }>(): FirestoreDataConverter<T> {
   };
 }
 
-export const householdConverter = withId<Household>();
+/**
+ * Household converter that backfills budget defaults for any category added
+ * after the household was created (e.g. "maid"). Stored values always win;
+ * defaults only fill in missing keys, so a category never silently vanishes
+ * from the budgets view just because the doc predates it — no migration needed.
+ */
+export const householdConverter: FirestoreDataConverter<Household> = {
+  toFirestore(model) {
+    const { id: _omit, ...rest } = model as Household & { id: string };
+    void _omit;
+    return rest as DocumentData;
+  },
+  fromFirestore(snap: QueryDocumentSnapshot) {
+    const data = snap.data();
+    return {
+      id: snap.id,
+      ...data,
+      budgets: { ...DEFAULT_BUDGETS, ...(data.budgets ?? {}) },
+    } as Household;
+  },
+};
 export const expenseConverter = withId<Expense>();
 export const settlementConverter = withId<Settlement>();
 export const recurringConverter = withId<RecurringExpense>();
