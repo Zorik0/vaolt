@@ -24,13 +24,6 @@ import { CATEGORY_MAP } from "@/lib/constants";
 import { money, percent } from "@/lib/format";
 import type { Expense } from "@/lib/types";
 
-function greeting(): string {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
-}
-
 export default function DashboardPage() {
   const { appUser, household, isManager, members } = useAuth();
   const { monthExpenses, myBalance, transfers, loading } = useData();
@@ -68,7 +61,7 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={`${greeting()}, ${appUser?.displayName.split(" ")[0] ?? ""}`}
+        title={appUser?.displayName.split(" ")[0] ?? "Home"}
         subtitle={household?.name}
         action={<MonthNav />}
       />
