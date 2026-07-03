@@ -26,6 +26,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: "water", label: "Water", color: "#3f8fa0", fixed: false, description: "Water charges" },
   { id: "wifi", label: "WiFi", color: "#b1566a", fixed: true, description: "Internet / broadband" },
   { id: "groceries", label: "Groceries", color: "#5c8a46", fixed: false, description: "Food & household supplies" },
+  { id: "maid", label: "Maid", color: "#a67c52", fixed: true, description: "Domestic help" },
   { id: "other", label: "Other", color: "#8b8578", fixed: false, description: "Everything else" },
 ];
 
@@ -45,6 +46,7 @@ export const DEFAULT_BUDGETS: BudgetMap = {
   electricity: 1000,
   groceries: 4000,
   wifi: 1000,
+  maid: 1500,
   other: 0,
 };
 
