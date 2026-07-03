@@ -34,7 +34,7 @@ function OfflineIndicator() {
 function MobileTopBar() {
   const { appUser, household } = useAuth();
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border glass px-4 py-3 safe-t lg:hidden">
+    <header className="sticky top-0 z-20 flex items-center justify-between bg-background px-4 pb-3 pt-3 safe-t lg:hidden">
       <Link href="/dashboard" className="flex items-center gap-2">
         <LogoMark size={28} />
         <span className="font-semibold tracking-tight text-foreground">{APP_NAME}</span>
@@ -59,7 +59,7 @@ function MobileFab() {
     <button
       onClick={() => openNew()}
       aria-label="Add expense"
-      className="fixed bottom-[calc(var(--nav-height)+0.75rem)] right-4 z-30 grid size-14 place-items-center rounded-full bg-brand text-brand-contrast shadow-soft-lg transition-transform active:scale-90 lg:hidden"
+      className="fixed bottom-[calc(var(--nav-height)+1rem)] right-4 z-50 grid size-14 place-items-center rounded-full bg-brand text-brand-contrast shadow-soft-xl ring-1 ring-brand-strong/40 transition-transform hover:scale-105 active:scale-90 lg:hidden"
     >
       <Plus className="size-7" strokeWidth={2.4} />
     </button>
