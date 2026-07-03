@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { auth, firebaseConfigured } from "@/lib/firebase/config";
+import { completeRedirectSignIn } from "@/lib/firebase/auth";
 import { ensureUserDoc, subscribeUserDoc } from "@/lib/db/users";
 import { subscribeHousehold } from "@/lib/db/households";
 import { LoadError } from "@/components/app/LoadError";
@@ -60,6 +61,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // 1. Auth state
   useEffect(() => {
     if (!firebaseConfigured) return;
+    // Finish any pending redirect sign-in (mobile / installed-PWA path).
+    // onAuthStateChanged still delivers the user; this just settles the
+    // redirect so its errors aren't swallowed.
+    completeRedirectSignIn().catch(() => {});
     return onAuthStateChanged(auth, (u) => setFirebaseUser(u ?? null));
   }, []);
 
