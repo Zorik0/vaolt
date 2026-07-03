@@ -55,7 +55,11 @@ function describeError(err: unknown): string {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<User | null | undefined>(undefined);
   const [appUser, setAppUser] = useState<AppUser | null | undefined>(undefined);
-  const [household, setHousehold] = useState<Household | null | undefined>(undefined);
+  // Keyed by the household id it was loaded for, so a value left over from a
+  // previous auth state can never masquerade as "this user has no household".
+  const [householdState, setHouseholdState] = useState<
+    { hid: string; doc: Household | null } | undefined
+  >(undefined);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   // 1. Auth state
@@ -94,13 +98,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!firebaseConfigured) return;
     if (!householdId) {
-      setHousehold(null);
+      setHouseholdState(undefined);
       return;
     }
-    setHousehold(undefined);
     return subscribeHousehold(
       householdId,
-      (h) => setHousehold(h),
+      (h) => setHouseholdState({ hid: householdId, doc: h }),
       (err) => setLoadError(describeError(err)),
     );
   }, [householdId]);
@@ -119,6 +122,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AuthContextValue>(() => {
     const uid = firebaseUser?.uid ?? null;
+    // Only trust the household doc if it belongs to the current householdId;
+    // during the switchover render it can still hold the previous user's state.
+    const household =
+      householdId && householdState?.hid === householdId ? householdState.doc : undefined;
 
     let status: Status;
     if (!firebaseConfigured) status = "unconfigured";
@@ -148,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       role: activeHousehold ? (activeHousehold.managerId === uid ? "manager" : "member") : null,
       isManager: !!activeHousehold && activeHousehold.managerId === uid,
     };
-  }, [firebaseUser, appUser, household, householdId]);
+  }, [firebaseUser, appUser, householdState, householdId]);
 
   // Surface fatal load errors before the app resolves, instead of hanging.
   const showError = loadError && value.status !== "ready" && appUser === undefined;

@@ -155,7 +155,7 @@ export default function ReportsPage() {
                   <span className="font-semibold text-foreground">{money(s)}</span>
                   <span className="text-subtle">/ {b > 0 ? money(b) : "—"}</span>
                   {b > 0 && (
-                    <span className={"w-14 text-right text-xs font-medium " + (over ? "text-negative" : "text-positive")}>
+                    <span className={"min-w-14 whitespace-nowrap text-right text-xs font-medium " + (over ? "text-negative" : "text-positive")}>
                       {over ? `+${money(s - b)}` : `${money(b - s)} left`}
                     </span>
                   )}
