@@ -15,7 +15,7 @@ type Size = keyof typeof SIZES;
 export function Avatar({
   name,
   photoURL,
-  color = "#1c6249",
+  color = "#d9600b",
   size = "md",
   className,
   ring,
