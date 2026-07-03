@@ -12,7 +12,7 @@ function svg(size, { maskable = false } = {}) {
   const g = glyphScale / 40;
   const t = (size - 40 * g) / 2;
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <rect width="${size}" height="${size}" rx="${radius}" fill="#1c6249"/>
+  <rect width="${size}" height="${size}" rx="${radius}" fill="#d9600b"/>
   <g transform="translate(${t} ${t}) scale(${g})" fill="none" stroke="#f4f2ea" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
     <path d="M11 20 L20 12.5 L29 20"/>
     <path d="M13.5 21.5 V27.5 H26.5 V21.5"/>

@@ -50,8 +50,8 @@ export const DEFAULT_BUDGETS: BudgetMap = {
 
 /** Palette assigned to members in join order — legible on light & dark. */
 export const MEMBER_COLORS = [
-  "#1c6249",
-  "#b06a1e",
+  "#d9600b",
+  "#2f8f86",
   "#3563a0",
   "#a23f5e",
   "#4f7d3f",
