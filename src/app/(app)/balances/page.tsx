@@ -108,7 +108,7 @@ export default function BalancesPage() {
             {transfers.map((t, i) => (
               <div key={i} className="flex items-center gap-3 p-3.5">
                 <div className="flex flex-1 items-center gap-2">
-                  <Avatar name={firstName(t.fromUid)} photoURL={memberOf(t.fromUid)?.photoURL} color={memberOf(t.fromUid)?.color} size="sm" />
+                  <Avatar name={memberOf(t.fromUid)?.displayName ?? "?"} photoURL={memberOf(t.fromUid)?.photoURL} color={memberOf(t.fromUid)?.color} size="sm" />
                   <div className="min-w-0 text-sm">
                     <span className="font-semibold text-foreground">{firstName(t.fromUid)}</span>
                     <span className="text-muted"> pays </span>

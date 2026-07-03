@@ -226,7 +226,7 @@ export function ExpenseForm({
         {/* Amount */}
         <div className="flex flex-col items-center pt-1">
           <label className="text-xs font-medium uppercase tracking-wide text-subtle">Amount</label>
-          <div className="mt-1 flex items-center">
+          <div className="mt-1 flex max-w-full items-center gap-1 rounded-2xl px-3 py-1 transition-shadow focus-within:[box-shadow:0_0_0_2px_var(--background),0_0_0_4px_var(--ring)]">
             <span className="text-3xl font-semibold text-subtle">₹</span>
             <input
               inputMode="decimal"
@@ -234,14 +234,17 @@ export function ExpenseForm({
               value={amountStr}
               onChange={(e) => setAmountStr(e.target.value.replace(/[^0-9.]/g, ""))}
               placeholder="0"
-              className="w-40 bg-transparent text-center text-5xl font-semibold tracking-tight text-foreground tabular-nums outline-none placeholder:text-border-strong"
+              className={cn(
+                "w-40 min-w-0 bg-transparent text-center font-semibold tracking-tight text-foreground tabular-nums outline-none placeholder:text-border-strong focus-visible:[box-shadow:none]",
+                amountStr.length > 7 ? "text-3xl" : amountStr.length > 5 ? "text-4xl" : "text-5xl",
+              )}
             />
           </div>
         </div>
 
         {/* Category */}
         <Field label="Category">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
             {CATEGORIES.map((c) => {
               const active = c.id === categoryId;
               return (
