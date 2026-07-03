@@ -4,6 +4,7 @@ import {
   Home,
   ShoppingBasket,
   Shapes,
+  SprayCan,
   Wifi,
   Zap,
   type LucideIcon,
@@ -19,6 +20,7 @@ export const CATEGORY_ICON: Record<CategoryId, LucideIcon> = {
   water: Droplets,
   wifi: Wifi,
   groceries: ShoppingBasket,
+  maid: SprayCan,
   other: Shapes,
 };
 

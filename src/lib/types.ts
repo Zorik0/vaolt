@@ -11,6 +11,7 @@ export type CategoryId =
   | "electricity"
   | "groceries"
   | "wifi"
+  | "maid"
   | "other";
 
 /** How an expense is divided across members. */
