@@ -26,7 +26,13 @@ export function subscribeUserDoc(
 ) {
   return onSnapshot(
     userDoc(uid),
-    (snap) => cb(snap.exists() ? (snap.data() as AppUser) : null),
+    (snap) => {
+      // A cached "missing doc" is not authoritative — the local cache starts
+      // empty on first load. Emitting null here flashes the app through the
+      // no-household state (and hijacks deep links); wait for the server.
+      if (!snap.exists() && snap.metadata.fromCache) return;
+      cb(snap.exists() ? (snap.data() as AppUser) : null);
+    },
     (err) => onError?.(err),
   );
 }

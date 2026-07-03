@@ -104,7 +104,12 @@ export function subscribeHousehold(
 ) {
   return onSnapshot(
     householdDoc(hid),
-    (snap) => cb(snap.exists() ? snap.data() : null),
+    (snap) => {
+      // Ignore the empty-cache "missing doc" snapshot on cold start; a null
+      // here would bounce a member with a real household to onboarding.
+      if (!snap.exists() && snap.metadata.fromCache) return;
+      cb(snap.exists() ? snap.data() : null);
+    },
     (err) => onError?.(err),
   );
 }
