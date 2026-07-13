@@ -50,7 +50,7 @@ function windowStart(): number {
 }
 
 export function HouseholdDataProvider({ children }: { children: React.ReactNode }) {
-  const { household, uid, isManager, members } = useAuth();
+  const { household, uid, members } = useAuth();
   const toast = useToast();
   const hid = household?.id ?? null;
 
@@ -82,9 +82,11 @@ export function HouseholdDataProvider({ children }: { children: React.ReactNode 
     return subscribeRecurring(hid, setRecurring);
   }, [hid]);
 
-  // Post any due recurring templates once per session (manager only).
+  // Post any due recurring templates once per session. Any member's device
+  // can do this; materialiseDueRecurring is transactional so concurrent
+  // sessions can't double-post.
   useEffect(() => {
-    if (!hid || !uid || !isManager || generatedRef.current) return;
+    if (!hid || !uid || generatedRef.current) return;
     if (recurring.length === 0) return;
     generatedRef.current = true;
     materialiseDueRecurring(hid, recurring, uid)
@@ -92,7 +94,7 @@ export function HouseholdDataProvider({ children }: { children: React.ReactNode 
         if (n > 0) toast.info(`Added ${n} recurring ${n === 1 ? "expense" : "expenses"} for this month.`);
       })
       .catch(() => {});
-  }, [hid, uid, isManager, recurring, toast]);
+  }, [hid, uid, recurring, toast]);
 
   const memberIds = useMemo(() => members.map((m) => m.uid), [members]);
 

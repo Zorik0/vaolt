@@ -29,7 +29,7 @@ export function ExpenseDetailSheet({
   open: boolean;
   onClose: () => void;
 }) {
-  const { household, isManager } = useAuth();
+  const { household } = useAuth();
   const { openEdit } = useExpenseForm();
   const toast = useToast();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -54,29 +54,27 @@ export function ExpenseDetailSheet({
         onClose={onClose}
         title="Expense"
         footer={
-          isManager ? (
-            <div className="flex gap-3">
-              <Button
-                variant="secondary"
-                className="flex-1"
-                icon={<Pencil className="size-4" />}
-                onClick={() => {
-                  onClose();
-                  openEdit(expense);
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="danger"
-                className="flex-1"
-                icon={<Trash2 className="size-4" />}
-                onClick={() => setConfirmOpen(true)}
-              >
-                Delete
-              </Button>
-            </div>
-          ) : undefined
+          <div className="flex gap-3">
+            <Button
+              variant="secondary"
+              className="flex-1"
+              icon={<Pencil className="size-4" />}
+              onClick={() => {
+                onClose();
+                openEdit(expense);
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="danger"
+              className="flex-1"
+              icon={<Trash2 className="size-4" />}
+              onClick={() => setConfirmOpen(true)}
+            >
+              Delete
+            </Button>
+          </div>
         }
       >
         <div className="space-y-5 pb-2">

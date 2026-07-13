@@ -24,7 +24,6 @@ export function BottomNav() {
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
   const moreActive = MORE_ITEMS.some((i) => isActive(i.href));
-  const moreItems = MORE_ITEMS.filter((i) => !i.managerOnly || isManager);
 
   return (
     <>
@@ -76,7 +75,7 @@ export function BottomNav() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {moreItems.map((item) => {
+            {MORE_ITEMS.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
               return (

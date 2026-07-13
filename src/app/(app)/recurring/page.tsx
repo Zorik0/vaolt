@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Pencil, Plus, Repeat, Trash2 } from "lucide-react";
+import { Pencil, Plus, Repeat, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { RecurringForm } from "@/components/app/RecurringForm";
 import { Card } from "@/components/ui/Card";
@@ -25,24 +25,11 @@ const ordinal = (n: number) => {
 };
 
 export default function RecurringPage() {
-  const { household, isManager } = useAuth();
+  const { household } = useAuth();
   const { recurring } = useData();
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<RecurringExpense | null>(null);
   const [toDelete, setToDelete] = useState<RecurringExpense | null>(null);
-
-  if (!isManager) {
-    return (
-      <>
-        <PageHeader title="Recurring" subtitle="Automated monthly expenses" />
-        <EmptyState
-          icon={Lock}
-          title="Manager only"
-          description="Only the house manager can set up recurring expenses."
-        />
-      </>
-    );
-  }
 
   const openNew = () => {
     setEditing(null);
