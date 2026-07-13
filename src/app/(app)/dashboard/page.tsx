@@ -25,7 +25,7 @@ import { money, percent } from "@/lib/format";
 import type { Expense } from "@/lib/types";
 
 export default function DashboardPage() {
-  const { appUser, household, isManager, members } = useAuth();
+  const { appUser, household } = useAuth();
   const { monthExpenses, myBalance, transfers, loading } = useData();
   const { openNew } = useExpenseForm();
   const [selected, setSelected] = useState<Expense | null>(null);
@@ -202,13 +202,11 @@ export default function DashboardPage() {
               <EmptyState
                 icon={Wallet}
                 title="No expenses yet"
-                description={isManager ? "Add your first expense to get started." : "Expenses will appear here."}
+                description="Add your first expense to get started."
                 action={
-                  isManager ? (
-                    <Button size="sm" icon={<Plus className="size-4" />} onClick={() => openNew()}>
-                      Add expense
-                    </Button>
-                  ) : undefined
+                  <Button size="sm" icon={<Plus className="size-4" />} onClick={() => openNew()}>
+                    Add expense
+                  </Button>
                 }
                 className="border-0"
               />

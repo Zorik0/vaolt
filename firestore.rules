@@ -69,7 +69,7 @@ service cloud.firestore {
       /* ----------------------- expenses ----------------------- */
       match /expenses/{eid} {
         allow read: if isMemberOf(hid);
-        allow create, update, delete: if isManagerOf(hid);
+        allow create, update, delete: if isMemberOf(hid);
       }
 
       /* ---------------------- settlements --------------------- */
@@ -86,7 +86,7 @@ service cloud.firestore {
       /* ----------------------- recurring ---------------------- */
       match /recurring/{rid} {
         allow read: if isMemberOf(hid);
-        allow create, update, delete: if isManagerOf(hid);
+        allow create, update, delete: if isMemberOf(hid);
       }
     }
   }

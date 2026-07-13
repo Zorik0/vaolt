@@ -24,7 +24,7 @@ import type { CategoryId, Expense } from "@/lib/types";
 type Sort = "recent" | "highest";
 
 export default function ExpensesPage() {
-  const { members, isManager } = useAuth();
+  const { members } = useAuth();
   const { monthExpenses, loading } = useData();
   const { openNew } = useExpenseForm();
 
@@ -149,20 +149,18 @@ export default function ExpensesPage() {
           description={
             activeFilters
               ? "Try adjusting your search or filters."
-              : isManager
-                ? "Add an expense to start tracking."
-                : "Expenses recorded this month will show up here."
+              : "Add an expense to start tracking."
           }
           action={
             activeFilters ? (
               <Button size="sm" variant="secondary" onClick={clearFilters}>
                 Clear filters
               </Button>
-            ) : isManager ? (
+            ) : (
               <Button size="sm" icon={<Plus className="size-4" />} onClick={() => openNew()}>
                 Add expense
               </Button>
-            ) : undefined
+            )
           }
         />
       ) : grouped ? (

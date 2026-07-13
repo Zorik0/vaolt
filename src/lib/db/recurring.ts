@@ -1,15 +1,18 @@
 import {
   addDoc,
   deleteDoc,
+  doc,
   onSnapshot,
   query,
+  runTransaction,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import type { RecurringExpense } from "../types";
+import type { Expense, RecurringExpense } from "../types";
+import { db } from "../firebase/config";
 import { monthKey } from "../format";
-import { addExpense } from "./expenses";
-import { recurringCol, recurringDoc } from "./converters";
+import { materialiseExpense } from "./expenses";
+import { expensesCol, recurringCol, recurringDoc } from "./converters";
 
 export type RecurringDraft = Omit<
   RecurringExpense,
@@ -56,7 +59,9 @@ export function subscribeRecurring(
 
 /**
  * Post any active recurring templates that haven't been generated for the
- * current month yet. Runs client-side when the manager opens the app.
+ * current month yet. Runs client-side when any member opens the app; each
+ * template is posted inside a transaction that re-checks `lastGenerated`,
+ * so concurrent sessions can't double-post the same bill.
  * Returns the number of expenses created.
  */
 export async function materialiseDueRecurring(
@@ -77,27 +82,36 @@ export async function materialiseDueRecurring(
     const day = Math.min(r.dayOfMonth, new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate());
     const date = new Date(now.getFullYear(), now.getMonth(), day, 12).getTime();
 
-    await addExpense(
-      hid,
-      {
-        amount: r.amount,
-        categoryId: r.categoryId,
-        description: r.description,
-        paidBy: r.paidBy,
-        splitType: r.splitType,
-        splitBetween: r.splitBetween,
-        shares: {},
-        date,
-        notes: "Auto-generated recurring expense",
-        receiptUrl: null,
-        receiptPath: null,
-        isRecurring: true,
-        recurringId: r.id,
-      },
-      createdBy,
-    );
-    await updateDoc(recurringDoc(hid, r.id), { lastGenerated: key });
-    created += 1;
+    const posted = await runTransaction(db, async (tx) => {
+      const snap = await tx.get(recurringDoc(hid, r.id));
+      const current = snap.data();
+      if (!current || !current.active || current.lastGenerated === key) return false;
+
+      tx.set(doc(expensesCol(hid)), {
+        ...materialiseExpense({
+          amount: r.amount,
+          categoryId: r.categoryId,
+          description: r.description,
+          paidBy: r.paidBy,
+          splitType: r.splitType,
+          splitBetween: r.splitBetween,
+          shares: {},
+          date,
+          notes: "Auto-generated recurring expense",
+          receiptUrl: null,
+          receiptPath: null,
+          isRecurring: true,
+          recurringId: r.id,
+        }),
+        createdBy,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      } as unknown as Expense);
+      tx.update(recurringDoc(hid, r.id), { lastGenerated: key });
+      return true;
+    }).catch(() => false);
+
+    if (posted) created += 1;
   }
   return created;
 }

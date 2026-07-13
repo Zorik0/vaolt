@@ -52,9 +52,7 @@ function MobileTopBar() {
 }
 
 function MobileFab() {
-  const { isManager } = useAuth();
   const { openNew } = useExpenseForm();
-  if (!isManager) return null;
   return (
     <button
       onClick={() => openNew()}

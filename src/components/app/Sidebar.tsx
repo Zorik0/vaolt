@@ -36,7 +36,6 @@ export function Sidebar() {
   const { openNew } = useExpenseForm();
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
-  const secondary = SECONDARY_NAV.filter((i) => !i.managerOnly || isManager);
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-border bg-surface/60 px-4 py-5 lg:flex">
@@ -53,18 +52,16 @@ export function Sidebar() {
 
       <div className="mt-2 truncate px-1 text-xs font-medium text-subtle">{household?.name}</div>
 
-      {isManager && (
-        <Button className="mt-4" icon={<Plus className="size-[1.15rem]" />} onClick={() => openNew()}>
-          Add expense
-        </Button>
-      )}
+      <Button className="mt-4" icon={<Plus className="size-[1.15rem]" />} onClick={() => openNew()}>
+        Add expense
+      </Button>
 
       <nav className="mt-5 flex flex-1 flex-col gap-0.5">
         {PRIMARY_NAV.map((item) => (
           <NavLink key={item.href} item={item} active={isActive(item.href)} />
         ))}
         <div className="my-3 h-px bg-border" />
-        {secondary.map((item) => (
+        {SECONDARY_NAV.map((item) => (
           <NavLink key={item.href} item={item} active={isActive(item.href)} />
         ))}
       </nav>

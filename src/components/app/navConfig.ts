@@ -14,7 +14,6 @@ export interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
-  managerOnly?: boolean;
 }
 
 export const PRIMARY_NAV: NavItem[] = [
@@ -27,7 +26,7 @@ export const PRIMARY_NAV: NavItem[] = [
 
 export const SECONDARY_NAV: NavItem[] = [
   { href: "/analytics", label: "Analytics", icon: TrendingUp },
-  { href: "/recurring", label: "Recurring", icon: Repeat, managerOnly: true },
+  { href: "/recurring", label: "Recurring", icon: Repeat },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

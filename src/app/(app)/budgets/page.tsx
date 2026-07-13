@@ -86,8 +86,8 @@ export default function BudgetsPage() {
           return (
             <Card
               key={b.categoryId}
-              interactive={isManager}
-              onClick={isManager ? () => openNew({ categoryId: b.categoryId }) : undefined}
+              interactive
+              onClick={() => openNew({ categoryId: b.categoryId })}
               className="p-4"
             >
               <div className="flex items-center gap-3">

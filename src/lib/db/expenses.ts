@@ -14,7 +14,7 @@ import { resolveShares } from "../finance";
 import { expenseConverter, expenseDoc, expensesCol } from "./converters";
 
 /** Recompute the authoritative shares + month before persisting a draft. */
-function materialise(draft: ExpenseDraft) {
+export function materialiseExpense(draft: ExpenseDraft) {
   const shares = resolveShares(
     draft.amount,
     draft.splitType,
@@ -46,7 +46,7 @@ export async function addExpense(
   createdBy: string,
 ): Promise<string> {
   const ref = await addDoc(expensesCol(hid), {
-    ...materialise(draft),
+    ...materialiseExpense(draft),
     createdBy,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -60,7 +60,7 @@ export async function updateExpense(
   draft: ExpenseDraft,
 ): Promise<void> {
   await updateDoc(expenseDoc(hid, id), {
-    ...materialise(draft),
+    ...materialiseExpense(draft),
     updatedAt: serverTimestamp(),
   });
 }
