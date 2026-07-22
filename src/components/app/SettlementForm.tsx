@@ -14,6 +14,8 @@ import { SETTLEMENT_METHODS } from "@/lib/constants";
 import { currentMonthKey, money } from "@/lib/format";
 import type { Transfer } from "@/lib/types";
 
+type AmountMode = "full" | "custom";
+
 export function SettlementForm({
   open,
   onClose,
@@ -27,13 +29,19 @@ export function SettlementForm({
   const toast = useToast();
 
   const [amountStr, setAmountStr] = useState("");
+  const [mode, setMode] = useState<AmountMode>("full");
   const [method, setMethod] = useState<string>("UPI");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const suggested = prefill?.amount ?? 0;
+  const hasSuggestion = suggested > 0.5;
+
   useEffect(() => {
     if (!open || !prefill) return;
-    setAmountStr(String(Math.round(prefill.amount)));
+    const withSuggestion = prefill.amount > 0.5;
+    setMode(withSuggestion ? "full" : "custom");
+    setAmountStr(withSuggestion ? String(Math.round(prefill.amount)) : "");
     setMethod("UPI");
     setNote("");
   }, [open, prefill]);
@@ -42,6 +50,21 @@ export function SettlementForm({
   const from = household?.members[prefill.fromUid];
   const to = household?.members[prefill.toUid];
   const amount = parseFloat(amountStr) || 0;
+
+  const selectMode = (next: AmountMode) => {
+    setMode(next);
+    if (next === "full") setAmountStr(String(Math.round(suggested)));
+  };
+
+  const remaining = suggested - amount;
+  const hint =
+    hasSuggestion && mode === "custom"
+      ? remaining > 0.5
+        ? `${money(remaining)} left after this`
+        : remaining < -0.5
+          ? `${money(-remaining)} more than owed`
+          : "Covers the full balance"
+      : null;
 
   const submit = async () => {
     if (!household || amount <= 0) return;
@@ -98,10 +121,26 @@ export function SettlementForm({
               inputMode="decimal"
               value={amountStr}
               onChange={(e) => setAmountStr(e.target.value.replace(/[^0-9.]/g, ""))}
-              className="w-36 bg-transparent text-center text-4xl font-semibold tracking-tight text-foreground tabular-nums outline-none placeholder:text-border-strong"
+              readOnly={hasSuggestion && mode === "full"}
+              className="w-36 bg-transparent text-center text-4xl font-semibold tracking-tight text-foreground tabular-nums outline-none read-only:cursor-default placeholder:text-border-strong"
               placeholder="0"
             />
           </div>
+          {hasSuggestion && (
+            <>
+              <SegmentedControl
+                className="mt-3 max-w-[16rem]"
+                value={mode}
+                onChange={selectMode}
+                options={[
+                  { value: "full", label: `Full · ${money(suggested)}` },
+                  { value: "custom", label: "Custom" },
+                ]}
+                size="sm"
+              />
+              {hint && <p className="mt-2 text-xs text-subtle">{hint}</p>}
+            </>
+          )}
         </div>
 
         <Field label="Method">
